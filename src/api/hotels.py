@@ -1,68 +1,52 @@
 from fastapi import APIRouter, Query, Path, Body
+from sqlalchemy import insert, select
+
 from src.api.dependencies import PaginationDep
+from src.database import async_session_maker, engine
+from src.models.hotels import HotelsOrm
 from src.shemas.hotels import Hotel, HotelPatch
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
-hotels = [
-
-    {"id": 1, "title": "Plaza", "address": "Sochi, Prospect Bobbed 137"},
-    {"id": 2, "title": "Zvezda", "address": "Sochi, Kovalevskaya street 35"},
-    {"id": 3, "title": "Abeda", "address": "Piter, Nevsky 100"},
-    {"id": 4, "title": "Hostel", "address": "Piter, Svobody 44"},
-    {"id": 5, "title": "Жемчужина", "address": "Казань, Остоженка 33"},
-    {"id": 6, "title": "Piece", "address": "Voroneg, volodarskogo 64"},
-    {"id": 7, "title": "gopa", "address": "Dubna, kujmisheva 234"},
-
-]
-
 
 @router.get("", summary="Получение всех отелей")
-def get_all_hotels(
+async def get_all_hotels(
         pagination: PaginationDep,
         id: int | None = Query(None, description="Идентификационный ключ отеля"),
         title: str | None = Query(None, description="Название отеля"),
 
 ):
-    hotels_ = []
-    for hotel in hotels:
-        if id and hotel["id"] != id:
-            continue
-        if title and hotel["title"] != title:
-            continue
-        hotels_.append(hotel)
-    return hotels_[pagination.per_page * (pagination.page - 1):][:pagination.per_page]
+    async with async_session_maker() as session:
+        query_get_hotel = select(HotelsOrm).filter_by(id=id, title=title)
+        res = await session.execute(query_get_hotel)
+    return res.scalars().all()
 
 
 @router.post("", summary="Добавление Отеля")
-def add_hotel(
+async def create_hotel(
         hotel_data: Hotel = Body(openapi_examples={
             "1": {"summary": "Москва", "value": {
                 "title": "Redisson",
-                "address": "Проспект Победы 77"
+                "location": "Проспект Победы 77"
 
             }},
             "2": {"summary": "Тверь", "value": {
                 "title": "Zvezda",
-                "address": "Симеоновская 60"
+                "location": "Симеоновская 60"
 
             }},
             "3": {"summary": "Санкт-Петербург", "value": {
                 "title": "Kovalevskaya",
-                "address": "Невский проспект 100"
+                "location": "Невский проспект 100"
 
             }}})
 ):
-    global hotels
-    new_hotel = {
-        "id": hotels[-1]["id"] + 1,
-        "title": hotel_data.title,
-        "address": hotel_data.address
-    }
-    hotels.append(new_hotel)
-    return {
-        "data": new_hotel
-    }
+    async with async_session_maker() as session:
+        add_hotel_stmt = insert(HotelsOrm).values(**hotel_data.model_dump())
+        print(add_hotel_stmt.compile(bind=engine, compile_kwargs={"literal_binds": True})) # Точный сырой запрос в БД
+        await session.execute(add_hotel_stmt)
+        await session.commit()
+    return {"status": "OK"}
 
 
 @router.put("/{hotel_id}", summary="Полное изменение отеля")
