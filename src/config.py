@@ -2,12 +2,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-
     DB_NAME: str
     DB_PORT: int
     DB_USER: str
     DB_PASS: str
     DB_HOST: str
+    DB_DELETE_PSW: str
 
     @property
     def DB_URL(self):
