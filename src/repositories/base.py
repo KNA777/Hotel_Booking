@@ -13,6 +13,7 @@ class BaseRepository:
     async def get_all(self, *args, **kwargs):
         query = select(self.model)
         result = await self.session.execute(query)
+
         return [self.schema.model_validate(model, from_attributes=True) for model in result.scalars().all()]
 
     # from_attributes=True это чтобы pydantic схема смогла перевести объект SQLAlchemy в pydantic объект
@@ -26,8 +27,8 @@ class BaseRepository:
             return None
         return self.schema.model_validate(model, from_attributes=True)
 
-    async def add_hotel(self, data: BaseModel):
-        stmt = insert(HotelsOrm).values(**data.model_dump()).returning(self.model)
+    async def add(self, data: BaseModel):
+        stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
         result = await self.session.execute(stmt)
         model = result.scalars().one()
         return self.schema.model_validate(model, from_attributes=True)
