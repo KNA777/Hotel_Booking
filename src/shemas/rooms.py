@@ -1,4 +1,7 @@
-from pydantic import BaseModel
+from typing import Annotated
+
+from fastapi import Body
+from pydantic import BaseModel, Field
 
 
 class RoomsRequest(BaseModel):
@@ -6,6 +9,7 @@ class RoomsRequest(BaseModel):
     description: str | None = None
     price: int
     quantity: int
+    facilities_ids: list[int] = []
 
 
 class RoomAdd(BaseModel):
