@@ -1,7 +1,4 @@
-from typing import Annotated
-
-from fastapi import Body
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class RoomsRequest(BaseModel):
@@ -25,7 +22,15 @@ class RoomsRequestPatch(BaseModel):
     description: str | None = None
     price: int | None = None
     quantity: int | None = None
+    facilities_ids: list[int] = []
 
+
+class RoomPatch(BaseModel):
+    hotel_id: int | None = None
+    title: str | None = None
+    description: str | None = None
+    price: int | None = None
+    quantity: int | None = None
 
 class Rooms(RoomAdd):
     id: int

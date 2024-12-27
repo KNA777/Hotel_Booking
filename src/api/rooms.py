@@ -2,7 +2,7 @@ from datetime import date
 from fastapi import APIRouter, Query
 from src.api.dependencies import DBDep
 from src.shemas.facilities import RoomFacilityAdd
-from src.shemas.rooms import RoomsRequest, RoomAdd, RoomsRequestPatch
+from src.shemas.rooms import RoomsRequest, RoomAdd, RoomsRequestPatch, RoomPatch
 
 router = APIRouter(prefix="/hotels", tags=["Номера"])
 
@@ -62,8 +62,19 @@ async def partial_change_room(
         hotel_id: int,
         room_id: int,
         data: RoomsRequestPatch):
-
-    await db.rooms.edit(data, exclude_unset=True, hotel_id=hotel_id, id=room_id)
+    _room_data_dict = data.model_dump(exclude_unset=True)
+    print(_room_data_dict)
+    _room_data = RoomPatch(hotel_id=hotel_id, **_room_data_dict)
+    #
+    # class RoomPatch(BaseModel):
+    #     hotel_id: int
+    #     title: str
+    #     description: str | None = None
+    #     price: int
+    #     quantity: int
+    await db.rooms.edit(_room_data, exclude_unset=True, id=room_id)
+    if "facilities_ids" in _room_data_dict:
+        await db.facilities_rooms.set_new_facilities_rooms(room_id, facility_ids=_room_data_dict["facilities_ids"])
     await db.commit()
     return {"status": True}
 
