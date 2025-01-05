@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+from src.shemas.facilities import Facility
+
 
 class RoomsRequest(BaseModel):
     title: str
@@ -33,4 +35,8 @@ class RoomPatch(BaseModel):
     quantity: int | None = None
 
 class Rooms(RoomAdd):
+
     id: int
+
+class RoomsWithRels(Rooms):
+    facilities: list[Facility]

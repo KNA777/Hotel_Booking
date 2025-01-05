@@ -17,14 +17,14 @@ class FacilitiesRoomsRepository(BaseRepository):
     model = FacilitiesRoomsOrm
     schema = RoomFacility
 
-    async def set_new_facilities_rooms(self, room_id, facility_ids: list[int]):
+    async def set_new_facilities_rooms(self, room_id: int, facility_ids: list[int]) -> None:
 
         ids_facility_in_m2m_table = (
             select(self.model.facility_id).filter_by(room_id=room_id)
         )
-        res = await self.session.execute(ids_facility_in_m2m_table)
 
-        current_ids_facilities = res.scalars().all()
+        res = await self.session.execute(ids_facility_in_m2m_table)
+        current_ids_facilities = res.scalars().all() # [1,2,3] список id удобств
         ids_to_delete = list(set(current_ids_facilities) - set(facility_ids))
         ids_to_insert = list(set(facility_ids) - set(current_ids_facilities))
 
@@ -35,7 +35,6 @@ class FacilitiesRoomsRepository(BaseRepository):
                         self.model.facility_id.in_(ids_to_delete)
                 )
             )
-
             await self.session.execute(delete_m2m_facilities)
 
         if ids_to_insert:
