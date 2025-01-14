@@ -22,7 +22,7 @@ async def get_all_rooms(
 
 @router.get("/{hotel_id}/rooms/{room_id}", summary="Получение одного номера")
 async def get_room(db: DBDep, hotel_id: int, room_id: int):
-    res = await db.rooms.get_one_or_none(id=room_id, hotel_id=hotel_id)
+    res = await db.rooms.get_one_or_none_with_rels(id=room_id, hotel_id=hotel_id)
     if not res:
         return f"Мы не нашли такой комнаты в данном отеле с {hotel_id} id"
     return res

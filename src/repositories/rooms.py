@@ -5,13 +5,14 @@ from sqlalchemy.orm import joinedload, selectinload
 
 from src.models.rooms import RoomsOrm
 from src.repositories.base import BaseRepository
+from src.repositories.mappers.mappers import RoomDataMapper, RoomDataWithRelsMapper
 from src.repositories.utils import rooms_ids_for_booking
 from src.shemas.rooms import Rooms, RoomsWithRels
 
 
 class RoomsRepository(BaseRepository):
     model = RoomsOrm
-    schema = Rooms
+    mapper = RoomDataMapper
 
     async def get_rooms_by_time(
             self,
@@ -27,4 +28,15 @@ class RoomsRepository(BaseRepository):
             .filter(RoomsOrm.id.in_(rooms_ids_to_get))
         )
         result = await self.session.execute(query)
-        return [RoomsWithRels.model_validate(model, from_attributes=True) for model in result.unique().scalars().all()]
+        return [RoomDataWithRelsMapper.map_to_domain_entity(model) for model in result.unique().scalars().all()]
+
+    async def get_one_or_none_with_rels(self, **filter_by):
+        query = (
+            select(self.model)
+            .options(selectinload(self.model.facilities))
+            .filter_by(**filter_by))
+        result = await self.session.execute(query)
+        model = result.scalars().one_or_none()  # scalars() берет из каждого кортежа первый элемент
+        if model is None:
+            return None
+        return RoomDataWithRelsMapper.map_to_domain_entity(model)
