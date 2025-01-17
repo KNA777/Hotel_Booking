@@ -14,7 +14,7 @@ def test_task():
 
 @celery_instance.task
 def resize_image(image_path: str):
-    sizes = [i for i in range(400, 1800, 10)]
+    sizes = [400, 600, 800]
     output_folder = "src/static/images"  # путь к папке куда сохранять изображение
 
     img = Image.open(image_path)  # открываем изображение
