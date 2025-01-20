@@ -3,9 +3,10 @@ import pytest
 
 from httpx import AsyncClient
 
+from src.api.dependencies import get_db
 from src.config import settings
 from src.contex_manager.db_manager import DBManager
-from src.database import BaseOrm, engine_null_pool, async_session_maker_null_poll, async_session_maker
+from src.database import BaseOrm, engine_null_pool, async_session_maker_null_poll
 from src.main import app
 from src.shemas.hotels import HotelAdd
 from src.shemas.rooms import RoomAdd
@@ -16,11 +17,18 @@ from src.models import *
 async def check_test_mode():
     assert settings.MODE == "TEST"
 
+async def db_null_pool():      # -> DBManager
+    async with DBManager(async_session_maker_null_poll) as db:
+        yield db
 
 @pytest.fixture(scope="function")
 async def db() -> DBManager:
-    async with DBManager(async_session_maker_null_poll) as db:
+    async for db in db_null_pool():
         yield db
+
+
+# Перезписывание зависимости DBManager для тестов api
+app.dependency_overrides[get_db] = db_null_pool
 
 
 @pytest.fixture(scope="session", autouse=True)

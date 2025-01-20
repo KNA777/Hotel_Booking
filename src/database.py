@@ -3,6 +3,15 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 from src.config import settings
 
+# Способ передачи NullPool соединения для тестов в engine
+
+# db_params = {}
+# if settings.MODE == "TEST":
+#     db_params = {
+#         "poolclass": NullPool
+#     }
+# engine = create_async_engine(settings.DB_URL, #**db_params)
+
 engine = create_async_engine(settings.DB_URL)  # echo=True для вывода в терминал запросов sqlalchemy в сыром виде
 engine_null_pool = create_async_engine(settings.DB_URL, poolclass=NullPool)
 
