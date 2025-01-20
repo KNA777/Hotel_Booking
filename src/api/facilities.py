@@ -9,19 +9,19 @@ router = APIRouter(prefix="/facilities", tags=["Удобства"])
 
 
 @router.get("", summary="Получение всех удобств")
-# @cache(expire=10)
+@cache(expire=10)
 async def get_facilities(db: DBDep):
     return await db.facilities.get_all()
 
 
 @router.post("", summary="Добавление удобств")
 async def add_facility(db: DBDep, data: FacilityAdd):
-    await db.facilities.add(data)
+    data = await db.facilities.add(data)
 
     test_task.delay()
 
     await db.commit()
-    return {"status": True}
+    return {"status": True, "data": data}
 
 
 

@@ -27,6 +27,7 @@ async def lifespan(_: FastAPI):
     await redis_manager.close()
 
 
+
 app = FastAPI(summary="Бронирование Отелей", lifespan=lifespan)
 
 app.include_router(auth_router)

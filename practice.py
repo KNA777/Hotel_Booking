@@ -1,13 +1,15 @@
-import json
+def decorator(x):
+    def wrapper(func):
+        def inner(*args, **kwargs):
+            print(f"{x=}")
+            res = func(*args, **kwargs)
+            return res
+        return inner
+    return wrapper
 
-# Исходный словарь
-data = {
-    "name": "ivan",
-    "age": 30,
-    "city": "moscow"
-}
+@decorator("MIR")
+def func1(c, b):
+    return c + b
 
-# Преобразование словаря в JSON
-json_data = json.dumps(data)
+print(func1(200, 400))
 
-print(json_data)
