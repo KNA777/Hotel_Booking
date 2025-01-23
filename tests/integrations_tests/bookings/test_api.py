@@ -1,7 +1,5 @@
 import pytest
-from sqlalchemy import text
 
-from src.database import engine_null_pool
 from tests.conftest import db_null_pool
 
 
@@ -33,6 +31,8 @@ async def test_add_booking(
 
 
 # ОЧИСТКА ТАБЛИЦЫ ОТ ДАННЫХ ПЕРЕД ТЕСТОМ (СЫРОЙ ЗАПРОС)
+# from sqlalchemy import text
+
 # @pytest.fixture(scope="session")
 # async def del_data_bookings():
 #     async with engine_null_pool.begin() as connect:

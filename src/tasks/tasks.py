@@ -5,7 +5,7 @@ from time import sleep
 from PIL import Image
 
 from src.contex_manager.db_manager import DBManager
-from src.database import async_session_maker, async_session_maker_null_poll
+from src.database import async_session_maker_null_poll
 from src.tasks.celery_app import celery_instance
 
 

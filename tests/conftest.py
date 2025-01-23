@@ -1,11 +1,8 @@
+# ruff: noqa: E402
 import json
-
-from fastapi import Request
-
 import pytest
 
 from unittest import mock
-
 
 mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
 
@@ -18,7 +15,7 @@ from src.database import BaseOrm, engine_null_pool, async_session_maker_null_pol
 from src.main import app
 from src.shemas.hotels import HotelAdd
 from src.shemas.rooms import RoomAdd
-from src.models import *
+from src.models import *    # noqa: F403
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -69,7 +66,7 @@ async def ac(setup_database) -> AsyncClient:
 
 @pytest.fixture(scope="session", autouse=True)
 async def register_user(ac, setup_database):
-    response = await ac.post(
+    await ac.post(
         "/auth/register",
         json={
             "email": "kot@pes.com",
@@ -78,7 +75,7 @@ async def register_user(ac, setup_database):
 
 @pytest.fixture(scope="session")
 async def auth_ac(ac, register_user):
-    response = await ac.post(
+    await ac.post(
         "/auth/login",
         json={
             "email": "kot@pes.com",

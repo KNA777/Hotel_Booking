@@ -6,7 +6,7 @@ from src.models.bookings import BookingsOrm
 from src.repositories.base import BaseRepository
 from src.repositories.mappers.mappers import BookingDataMapper
 from src.repositories.utils import rooms_ids_for_booking
-from src.shemas.bookings import BookingsRequest, BookingsAdd
+from src.shemas.bookings import BookingsAdd
 
 
 class BookingsRepository(BaseRepository):

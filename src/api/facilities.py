@@ -24,7 +24,7 @@ async def add_facility(db: DBDep, data: FacilityAdd):
     return {"status": True, "data": data}
 
 
-
+# ПРИМЕР ПОДКЛЮЧЕНИЯ И РАБОТЫ С REDIS
 # @router.get("", summary="Получение всех удобств")
 # async def get_facilities(db: DBDep):
 #     facilities_from_cash = await redis_manager.get("facilities")
@@ -32,7 +32,7 @@ async def add_facility(db: DBDep, data: FacilityAdd):
 #         facilities = await db.facilities.get_all()
 #         facilities_schemas: list[dict] = [f.model_dump() for f in facilities]
 #         print(facilities_schemas)
-#         facilities_json = json.dumps(facilities_schemas)
+#         facilities_json = json.dumps(facilities_schemas) Конвертация в JSON формат
 #         await redis_manager.set("facilities", facilities_json, expire=10)
 #         return facilities
 #     else:

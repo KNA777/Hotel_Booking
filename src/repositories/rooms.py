@@ -7,7 +7,6 @@ from src.models.rooms import RoomsOrm
 from src.repositories.base import BaseRepository
 from src.repositories.mappers.mappers import RoomDataMapper, RoomDataWithRelsMapper
 from src.repositories.utils import rooms_ids_for_booking
-from src.shemas.rooms import Rooms, RoomsWithRels
 
 
 class RoomsRepository(BaseRepository):
@@ -36,7 +35,7 @@ class RoomsRepository(BaseRepository):
             .options(selectinload(self.model.facilities))
             .filter_by(**filter_by))
         result = await self.session.execute(query)
-        model = result.scalars().one_or_none()  # scalars() берет из каждого кортежа первый элемент
+        model = result.scalars().one_or_none()
         if model is None:
             return None
         return RoomDataWithRelsMapper.map_to_domain_entity(model)

@@ -2,7 +2,7 @@ from datetime import date
 from fastapi import APIRouter, Query
 from src.api.dependencies import DBDep
 from src.shemas.facilities import RoomFacilityAdd
-from src.shemas.rooms import RoomsRequest, RoomAdd, RoomsRequestPatch, RoomPatch, Rooms
+from src.shemas.rooms import RoomsRequest, RoomAdd, RoomsRequestPatch, RoomPatch
 
 router = APIRouter(prefix="/hotels", tags=["Номера"])
 

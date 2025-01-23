@@ -3,8 +3,6 @@ from fastapi import HTTPException
 from pydantic import BaseModel
 from sqlalchemy import select, insert, delete, update
 
-from src.models.facilities import FacilitiesRoomsOrm
-from src.models.rooms import RoomsOrm
 from src.repositories.mappers.base import DataMapper
 
 
