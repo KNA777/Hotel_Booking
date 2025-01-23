@@ -14,12 +14,11 @@ class BaseRepository:
         self.session = session
 
     async def get_filtered(self, *filter, **filter_by):
-        query = (
-            select(self.model)
-            .filter(*filter)
-            .filter_by(**filter_by))
+        query = select(self.model).filter(*filter).filter_by(**filter_by)
         result = await self.session.execute(query)
-        return [self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]
+        return [
+            self.mapper.map_to_domain_entity(model) for model in result.scalars().all()
+        ]
 
     async def get_all(self, *args, **kwargs):
         return await self.get_filtered()
@@ -30,7 +29,9 @@ class BaseRepository:
     async def get_one_or_none(self, **filter_by):
         query = select(self.model).filter_by(**filter_by)
         result = await self.session.execute(query)
-        model = result.scalars().one_or_none()  # scalars() берет из каждого кортежа первый элемент
+        model = (
+            result.scalars().one_or_none()
+        )  # scalars() берет из каждого кортежа первый элемент
         if model is None:
             return None
         return self.mapper.map_to_domain_entity(model)
@@ -49,9 +50,12 @@ class BaseRepository:
             stmt = insert(self.model).values([item.model_dump() for item in data])
             await self.session.execute(stmt)
 
-
     async def edit(self, data: BaseModel, exclude_unset: bool = False, **filter_by):
-        stmt = update(self.model).filter_by(**filter_by).values(**data.model_dump(exclude_unset=exclude_unset))
+        stmt = (
+            update(self.model)
+            .filter_by(**filter_by)
+            .values(**data.model_dump(exclude_unset=exclude_unset))
+        )
         await self.session.execute(stmt)
 
     # exclude_unset=True - те поля которые не изменялись, не будут записываться как null в таблицу
@@ -59,4 +63,3 @@ class BaseRepository:
     async def delete(self, **filter_by):
         stmt = delete(self.model).filter_by(**filter_by)
         await self.session.execute(stmt)
-

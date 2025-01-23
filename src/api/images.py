@@ -1,4 +1,4 @@
-import shutil  #для копирования и архивирования файлов
+import shutil  # для копирования и архивирования файлов
 
 from fastapi import APIRouter, UploadFile
 from src.tasks.tasks import resize_image

@@ -13,9 +13,13 @@ class AuthService:
     @staticmethod
     def create_access_token(data: dict):
         to_encode = data.copy()
-        expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(
+            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+        )
         to_encode |= {"exp": expire}
-        encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+        encoded_jwt = jwt.encode(
+            to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
+        )
         return encoded_jwt
 
     @staticmethod
@@ -27,7 +31,7 @@ class AuthService:
 
     @classmethod
     def hashed_password(cls, password):
-        return  cls.pwd_context.hash(password)
+        return cls.pwd_context.hash(password)
 
     @classmethod
     def verify_password(cls, plain_password, hashed_password):

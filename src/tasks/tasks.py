@@ -26,7 +26,9 @@ def resize_image(image_path: str):
     name, ext = os.path.splitext(base_name)  # получаем имя и расширение картинки
 
     for size in sizes:
-        img_resized = img.resize((size, int(img.height * (size / img.width))), Image.Resampling.LANCZOS)
+        img_resized = img.resize(
+            (size, int(img.height * (size / img.width))), Image.Resampling.LANCZOS
+        )
 
         # имя нового файла
         new_file_name = f"{name}_{size}px{ext}"
@@ -37,7 +39,9 @@ def resize_image(image_path: str):
         # сохраняем изображение
         img_resized.save(output_path)
 
-    print(f"Изображение сохранено в слудующих размерах : {sizes} в папке {output_folder}")
+    print(
+        f"Изображение сохранено в слудующих размерах : {sizes} в папке {output_folder}"
+    )
 
 
 async def get_bookings_today_checkin_helper():

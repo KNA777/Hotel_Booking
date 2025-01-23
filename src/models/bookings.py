@@ -9,7 +9,6 @@ from src.database import BaseOrm
 
 
 class BookingsOrm(BaseOrm):
-
     __tablename__ = "bookings"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -22,4 +21,3 @@ class BookingsOrm(BaseOrm):
     @hybrid_property
     def total_price(self):
         return self.price * (self.date_to - self.date_from).days
-

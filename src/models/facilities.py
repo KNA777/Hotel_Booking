@@ -8,20 +8,17 @@ if typing.TYPE_CHECKING:
 
 
 class FacilitiesOrm(BaseOrm):
-
     __tablename__ = "facilities"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(25))
 
     rooms: Mapped[list["RoomsOrm"]] = relationship(
-        back_populates="facilities",
-        secondary="facilities_rooms"
+        back_populates="facilities", secondary="facilities_rooms"
     )
 
 
 class FacilitiesRoomsOrm(BaseOrm):
-
     __tablename__ = "facilities_rooms"
 
     id: Mapped[int] = mapped_column(primary_key=True)

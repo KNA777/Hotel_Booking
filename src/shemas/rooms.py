@@ -34,9 +34,10 @@ class RoomPatch(BaseModel):
     price: int | None = None
     quantity: int | None = None
 
-class Rooms(RoomAdd):
 
+class Rooms(RoomAdd):
     id: int
+
 
 class RoomsWithRels(Rooms):
     facilities: list[Facility]

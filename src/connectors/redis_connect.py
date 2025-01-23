@@ -2,9 +2,8 @@ import redis.asyncio as redis
 
 
 class RedisManager:
-
     def __init__(self, host: str, port: int):
-        self.host= host
+        self.host = host
         self.port = port
         self.redis = None
 
@@ -26,6 +25,3 @@ class RedisManager:
     async def close(self):
         if self.redis:
             await self.redis.close()
-
-
-
