@@ -29,7 +29,7 @@ async def db_null_pool():      # -> DBManager
     async with DBManager(async_session_maker_null_poll) as db:
         yield db
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="function")  # -> DBManager
 async def db() -> DBManager:
     async for db in db_null_pool():
         yield db

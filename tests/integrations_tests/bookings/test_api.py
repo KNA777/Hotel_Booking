@@ -2,6 +2,7 @@ import pytest
 from sqlalchemy import text
 
 from src.database import engine_null_pool
+from tests.conftest import db_null_pool
 
 
 @pytest.mark.parametrize("room_id, date_from, date_to, status_code", [
@@ -31,21 +32,28 @@ async def test_add_booking(
         assert isinstance(response.json(), dict)
 
 
-# ОЧИСТКА ТАБЛИЦЫ ОТ ДАННЫХ ПЕРЕД ТЕСТОМ
-@pytest.fixture(scope="session")
-async def del_data_bookings():
-    async with engine_null_pool.begin() as connect:
-        await connect.execute(text("DELETE FROM bookings"))
-    await engine_null_pool.dispose()
+# ОЧИСТКА ТАБЛИЦЫ ОТ ДАННЫХ ПЕРЕД ТЕСТОМ (СЫРОЙ ЗАПРОС)
+# @pytest.fixture(scope="session")
+# async def del_data_bookings():
+#     async with engine_null_pool.begin() as connect:
+#         await connect.execute(text("DELETE FROM bookings"))
+#     await engine_null_pool.dispose()
 
+
+@pytest.fixture(scope="module")
+async def del_data_bookings():
+    async for db_ in db_null_pool():
+        await db_.bookings.delete()
+        await db_.commit()
 
 @pytest.mark.parametrize("room_id, date_from, date_to, count_booking, status_code", [
     (1, "2024-08-01", "2024-08-10", 1, 200),
     (2, "2024-08-02", "2024-08-11", 2, 200),
     (3, "2024-08-03", "2024-08-12", 3, 200),
 ])
-async def test_count_bookings(del_data_bookings, auth_ac,
-                              room_id, date_from, date_to, count_booking, status_code):
+async def test_count_bookings(
+        room_id, date_from, date_to, count_booking, status_code,
+                                    del_data_bookings, auth_ac,):
     response = await auth_ac.post(
         "/bookings",
         json={
