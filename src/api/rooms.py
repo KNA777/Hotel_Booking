@@ -1,6 +1,8 @@
 from datetime import date
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, HTTPException
 from src.api.dependencies import DBDep
+from src.exceptions import check_date_from_to_date_to, ObjectNotFoundException, HotelNotFoundHTTPException, \
+    RoomNotFoundHTTPException
 from src.shemas.facilities import RoomFacilityAdd
 from src.shemas.rooms import RoomsRequest, RoomAdd, RoomsRequestPatch, RoomPatch
 
@@ -9,11 +11,12 @@ router = APIRouter(prefix="/hotels", tags=["Номера"])
 
 @router.get("/{hotel_id}/rooms", summary="Получение всех номеров")
 async def get_all_rooms(
-    db: DBDep,
-    hotel_id: int,
-    date_from: date = Query(example="2024-12-15"),
-    date_to: date = Query(example="2024-12-19"),
+        db: DBDep,
+        hotel_id: int,
+        date_from: date = Query(example="2024-12-15"),
+        date_to: date = Query(example="2024-12-19"),
 ):
+    check_date_from_to_date_to(date_from, date_to)
     result = await db.rooms.get_rooms_by_time(
         hotel_id=hotel_id, date_from=date_from, date_to=date_to
     )
@@ -24,14 +27,18 @@ async def get_all_rooms(
 
 @router.get("/{hotel_id}/rooms/{room_id}", summary="Получение одного номера")
 async def get_room(db: DBDep, hotel_id: int, room_id: int):
-    res = await db.rooms.get_one_or_none_with_rels(id=room_id, hotel_id=hotel_id)
-    if not res:
-        return f"Мы не нашли такой комнаты в данном отеле с {hotel_id} id"
-    return res
+    room =  await db.rooms.get_one_or_none_with_rels(id=room_id, hotel_id=hotel_id)
+    if not room:
+        raise HTTPException(status_code=404, detail="Номер не найден")
+    return room
 
 
 @router.post("/{hotel_id}/rooms", summary="Добавление номера")
 async def add_room(db: DBDep, hotel_id: int, data_room: RoomsRequest):
+    try:
+        await db.hotels.get_one(id=hotel_id)
+    except ObjectNotFoundException:
+        raise HotelNotFoundHTTPException
     new_data_room = RoomAdd(hotel_id=hotel_id, **data_room.model_dump())
     result = await db.rooms.add(new_data_room)
     rooms_facility_data = [
@@ -45,6 +52,14 @@ async def add_room(db: DBDep, hotel_id: int, data_room: RoomsRequest):
 
 @router.put("/{hotel_id}/rooms/{room_id}", summary="Полное изменение атрибутов номера")
 async def full_change_room(db: DBDep, hotel_id: int, room_id: int, data: RoomsRequest):
+    try:
+        await db.hotels.get_one(id=hotel_id)
+    except ObjectNotFoundException:
+        raise HotelNotFoundHTTPException
+    try:
+        await db.rooms.get_one(id=room_id)
+    except ObjectNotFoundException:
+        raise RoomNotFoundHTTPException
     room_data = RoomAdd(hotel_id=hotel_id, **data.model_dump())
     await db.rooms.edit(room_data, id=room_id)
     await db.facilities_rooms.set_new_facilities_rooms(
@@ -58,8 +73,16 @@ async def full_change_room(db: DBDep, hotel_id: int, room_id: int, data: RoomsRe
     "/{hotel_id}/rooms/{room_id}", summary="Частичное изменение атрибутов номера"
 )
 async def partial_change_room(
-    db: DBDep, hotel_id: int, room_id: int, data: RoomsRequestPatch
+        db: DBDep, hotel_id: int, room_id: int, data: RoomsRequestPatch
 ):
+    try:
+        await db.hotels.get_one(id=hotel_id)
+    except ObjectNotFoundException:
+        raise HotelNotFoundHTTPException
+    try:
+        await db.rooms.get_one(id=room_id)
+    except ObjectNotFoundException:
+        raise RoomNotFoundHTTPException
     _room_data_dict = data.model_dump(exclude_unset=True)
     _room_data = RoomPatch(hotel_id=hotel_id, **_room_data_dict)
     await db.rooms.edit(_room_data, exclude_unset=True, id=room_id)
@@ -73,6 +96,14 @@ async def partial_change_room(
 
 @router.delete("/{hotel_id}/rooms/{room_id}", summary="Удаление номера")
 async def delete_room(db: DBDep, hotel_id: int, room_id: int):
+    try:
+        await db.hotels.get_one(id=hotel_id)
+    except ObjectNotFoundException:
+        raise HotelNotFoundHTTPException
+    try:
+        await db.rooms.get_one(id=room_id)
+    except ObjectNotFoundException:
+        raise RoomNotFoundHTTPException
     await db.rooms.delete(hotel_id=hotel_id, id=room_id)
     await db.commit()
     return {"status": True}

@@ -2,6 +2,7 @@ from datetime import datetime
 from fastapi import HTTPException
 from sqlalchemy import select, insert
 
+from src.exceptions import AllRoomsAreBookedException
 from src.models.bookings import BookingsOrm
 from src.repositories.base import BaseRepository
 from src.repositories.mappers.mappers import BookingDataMapper
@@ -27,22 +28,9 @@ class BookingsRepository(BaseRepository):
         res = await self.session.execute(rooms_ids_to_get)
         result = res.scalars().all()
 
-        if data.room_id not in result:
-            raise HTTPException(
-                status_code=400, detail="Нельзя забронировать этот номер"
-            )
+        if data.room_id in result:
+            new_booking = await self.add(data)
+            return new_booking
+        else:
+            raise AllRoomsAreBookedException
 
-        stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
-        result = await self.session.execute(stmt)
-        model = result.scalars().one()
-        return self.mapper.map_to_domain_entity(model)
-
-        # rooms_to_get = (
-        #     select(RoomsOrm)
-        #     .select_from(RoomsOrm)
-        #     .filter(RoomsOrm.id.in_(rooms_ids_to_get))
-        # )
-        #
-        #
-        # # res = await self.session.execute(rooms_to_get)
-        # # return [Rooms.model_validate(model, from_attributes=True) for model in res.scalars().all()]

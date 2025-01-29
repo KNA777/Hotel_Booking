@@ -1,4 +1,4 @@
-from pydantic import EmailStr
+from pydantic import EmailStr, BaseModel
 from sqlalchemy import select
 from src.models.users import UsersOrm
 from src.repositories.base import BaseRepository
@@ -17,3 +17,4 @@ class UsersRepository(BaseRepository):
             result.scalars().one()
         )  # scalars() берет из каждого кортежа первый элемент
         return UserWithHashedPassword.model_validate(model, from_attributes=True)
+
