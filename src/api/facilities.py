@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from fastapi_cache.decorator import cache
 
 from src.api.dependencies import DBDep
+from src.services.facilities import FacilityService
 from src.shemas.facilities import FacilityAdd
 from src.tasks.tasks import test_task
 
@@ -11,17 +12,13 @@ router = APIRouter(prefix="/facilities", tags=["Удобства"])
 @router.get("", summary="Получение всех удобств")
 @cache(expire=10)
 async def get_facilities(db: DBDep):
-    return await db.facilities.get_all()
+    return await FacilityService(db).get_facilities()
 
 
 @router.post("", summary="Добавление удобств")
 async def add_facility(db: DBDep, data: FacilityAdd):
-    data = await db.facilities.add(data)
-
-    test_task.delay()
-
-    await db.commit()
-    return {"status": True, "data": data}
+    facility = await FacilityService(db).create_facility(data)
+    return {"status": True, "data": facility}
 
 
 # ПРИМЕР ПОДКЛЮЧЕНИЯ И РАБОТЫ С REDIS

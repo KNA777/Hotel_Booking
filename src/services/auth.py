@@ -6,8 +6,12 @@ from src.config import settings
 from passlib.context import CryptContext
 import jwt
 
+from src.exceptions import ObjectAlreadyExistsException, UserMailAlreadyExist
+from src.services.base import BaseService
+from src.shemas.users import UserRequestAdd, UserAdd
 
-class AuthService:
+
+class AuthService(BaseService):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     @staticmethod
@@ -36,3 +40,13 @@ class AuthService:
     @classmethod
     def verify_password(cls, plain_password, hashed_password):
         return cls.pwd_context.verify(plain_password, hashed_password)
+
+
+    async def register(self, data: UserRequestAdd):
+        hashed_password = self.hashed_password(data.password)
+        user_add_data = UserAdd(email=data.email, hashed_password=hashed_password)
+        try:
+            await self.db.users.add(user_add_data)
+            await self.db.commit()
+        except ObjectAlreadyExistsException:
+            raise UserMailAlreadyExist
