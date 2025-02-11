@@ -11,7 +11,6 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASS: str
     DB_HOST: str
-    DB_DELETE_PSW: str
 
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str

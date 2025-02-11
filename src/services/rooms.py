@@ -40,8 +40,10 @@ class RoomService(BaseService):
             RoomFacilityAdd(room_id=result.id, facility_id=f_id)
             for f_id in data_room.facilities_ids
         ]
-        await self.db.facilities_rooms.add_bulk(rooms_facility_data)
+        if rooms_facility_data:
+            await self.db.facilities_rooms.add_bulk(rooms_facility_data)
         await self.db.commit()
+        return result
 
     async def full_change_room(self, hotel_id: int, room_id: int, room_data: RoomsRequest):
         await HotelService(self.db).check_hotel_exist(hotel_id)

@@ -54,17 +54,16 @@ class BaseRepository:
                 raise ex
 
     async def add_bulk(self, data: list[BaseModel]):
-        if data:
-            stmt = insert(self.model).values([item.model_dump() for item in data])
-            await self.session.execute(stmt)
+        stmt = insert(self.model).values([item.model_dump() for item in data])
+        await self.session.execute(stmt)
 
     async def edit(self, data: BaseModel, exclude_unset: bool = False, **filter_by):
         stmt = (
             update(self.model)
             .filter_by(**filter_by)
-            .values(**data.model_dump(exclude_unset=exclude_unset))  # exclude_unset=True - те поля которые
-        )  # не изменялись, не будут записываться
-        # как null в таблицу
+            .values(**data.model_dump(exclude_unset=exclude_unset))     # exclude_unset=True - те поля которые
+        )                                                               # не изменялись, не будут записываться
+                                                                        # как null в таблицу
         await self.session.execute(stmt)
 
     async def delete(self, **filter_by):
