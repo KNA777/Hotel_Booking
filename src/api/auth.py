@@ -1,13 +1,11 @@
-from os import access
-
-from fastapi import HTTPException, Response
+from fastapi import Response
 from fastapi import APIRouter, Body
 from src.api.dependencies import UserIdDep, DBDep
-from src.exceptions import ObjectAlreadyExistsException, MailAlreadyExistHTTPException, UserMailAlreadyExist, \
-    UserRegistrationPswException, UserRegistrationPswHTTPException, ObjectNotFoundException, \
-    UserMailNotExistHTTPException, UserMailNotExistException, UserWrongEnterPswException, UserWrongEnterPswHTTPException
+from src.exceptions import MailAlreadyExistHTTPException, UserMailAlreadyExist, \
+    UserRegistrationPswException, UserRegistrationPswHTTPException, UserMailNotExistException, \
+    UserMailNotExistHTTPException, UserWrongEnterPswException, UserWrongEnterPswHTTPException
 from src.services.auth import AuthService
-from src.shemas.users import UserRequestAdd, UserAdd
+from src.shemas.users import UserRequestAdd
 
 router = APIRouter(prefix="/auth", tags=["Аутентификация и авторизация"])
 
@@ -56,7 +54,7 @@ async def login_user(
     return {"access_token": access_token}
 
 
-@router.get("/me")
+@router.get("/me", summary="🧑🏻‍💻")
 async def get_me(db: DBDep, user_id: UserIdDep):
     user = await db.users.get_one_or_none(id=user_id)
     return user

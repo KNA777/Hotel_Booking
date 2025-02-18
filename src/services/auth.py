@@ -6,8 +6,8 @@ from src.config import settings
 from passlib.context import CryptContext
 import jwt
 
-from src.exceptions import ObjectAlreadyExistsException, UserMailAlreadyExist, UserRegistrationPswException, \
-    UserMailNotExistException, ObjectNotFoundException, UserWrongEnterPswException
+from src.exceptions import ObjectAlreadyExistsException, UserMailAlreadyExist, ObjectNotFoundException, \
+    UserMailNotExistException, UserWrongEnterPswException, UserRegistrationPswException
 from src.services.base import BaseService
 from src.shemas.users import UserRequestAdd, UserAdd
 
@@ -41,7 +41,6 @@ class AuthService(BaseService):
     @classmethod
     def verify_password(cls, plain_password, hashed_password):
         return cls.pwd_context.verify(plain_password, hashed_password)
-
 
     async def register(self, data: UserRequestAdd):
         if len(data.password) < 6:
