@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 from src.contex_manager.db_manager import DBManager
 from src.database import async_session_maker
+from src.exceptions import TokenErrorHTTPException
 from src.services.auth import AuthService
 
 
@@ -22,7 +23,7 @@ PaginationDep = Annotated[PaginationParams, Depends()]
 def get_token(request: Request) -> str:
     token = request.cookies.get("access_token", None)
     if not token:
-        raise HTTPException(status_code=401, detail="Вы не предоставили токен")
+        raise TokenErrorHTTPException
     return token
 
 

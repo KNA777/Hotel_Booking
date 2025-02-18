@@ -2,7 +2,8 @@ from datetime import date
 
 from fastapi import HTTPException
 
-from src.exceptions import HotelNotFoundException, ObjectNotFoundException
+from src.exceptions import HotelNotFoundException, ObjectNotFoundException, ObjectAlreadyExistsException, \
+    HotelAlreadyExistsException
 from src.services.base import BaseService
 from src.shemas.hotels import HotelAdd, HotelPatch
 
@@ -30,7 +31,10 @@ class HotelService(BaseService):
         return await self.db.hotels.get_one(id=hotel_id)
 
     async def add_hotel(self, data: HotelAdd):
-        hotel = await self.db.hotels.add(data)
+        try:
+            hotel = await self.db.hotels.add(data)
+        except ObjectAlreadyExistsException:
+            raise HotelAlreadyExistsException
         await self.db.commit()
         return hotel
 

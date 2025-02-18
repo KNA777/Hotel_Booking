@@ -6,8 +6,9 @@ from fastapi import HTTPException
 from fastapi import APIRouter, Query, Path, Body
 from fastapi_cache.decorator import cache
 
-from src.api.dependencies import PaginationDep, DBDep
-from src.exceptions import ObjectNotFoundException, HotelNotFoundHTTPException
+from src.api.dependencies import PaginationDep, DBDep, UserIdDep
+from src.exceptions import ObjectNotFoundException, HotelNotFoundHTTPException, HotelAlreadyExistsException, \
+    HotelAlreadyExistsHTTPException
 from src.services.hotels import HotelService
 from src.shemas.hotels import HotelPatch, HotelAdd
 
@@ -43,6 +44,7 @@ async def get_one_hotel(hotel_id: int, db: DBDep):
 
 @router.post("", summary="Добавление Отеля")
 async def create_hotel(
+        user_id: UserIdDep,
         db: DBDep,
         hotel_data: HotelAdd = Body(
             openapi_examples={
@@ -67,7 +69,11 @@ async def create_hotel(
             }
         ),
 ):
-    hotel = await HotelService(db).add_hotel(hotel_data)
+
+    try:
+        hotel = await HotelService(db).add_hotel(hotel_data)
+    except HotelAlreadyExistsException:
+        raise HotelAlreadyExistsHTTPException
     return {"status": "OK", "hotel": hotel}
 
 

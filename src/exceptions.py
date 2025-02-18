@@ -13,10 +13,23 @@ class AuthUserExceptions(Exception):
 class UserMailAlreadyExist(AuthUserExceptions):
     detail = "Ошибка регистрации пользователя почта уже существует"
 
+
+class UserMailNotExistException(AuthUserExceptions):
+    detail = "Ошибка ввода почты, проверьте правильность введенных данных"
+
+
+class UserRegistrationPswException(AuthUserExceptions):
+    detail = "Пароль должен содержать минимум 6 символов"
+
+
+class UserWrongEnterPswException(AuthUserExceptions):
+    detail = "Неверный пароль"
+
+
 class BookingsExceptions(Exception):
     detail = "ОШИБКА"
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(self.detail, **kwargs)
 
 
@@ -34,6 +47,10 @@ class HotelNotFoundException(ObjectNotFoundException):
 
 class ObjectAlreadyExistsException(BookingsExceptions):
     detail = "Похожий объект уже существует"
+
+
+class HotelAlreadyExistsException(BookingsExceptions):
+    detail = "Отель с таким названием уже существует"
 
 
 class AllRoomsAreBookedException(BookingsExceptions):
@@ -66,6 +83,7 @@ class RoomNotFoundHTTPException(BookingsHTTPExceptions):
     status_code = 404
     detail = "Номер не найден"
 
+
 class MailAlreadyExistHTTPException(BookingsHTTPExceptions):
     status_code = 422
     detail = "Почта уже существует"
@@ -74,3 +92,28 @@ class MailAlreadyExistHTTPException(BookingsHTTPExceptions):
 class AllRoomsAreBookedHTTPException(BookingsHTTPExceptions):
     status_code = 404
     detail = "Не осталось свободных номеров"
+
+
+class UserRegistrationPswHTTPException(BookingsHTTPExceptions):
+    status_code = 422
+    detail = "Пароль должен содержать минимум 6 символов"
+
+
+class HotelAlreadyExistsHTTPException(BookingsHTTPExceptions):
+    status_code = 422
+    detail = "Отель с таким названием уже существует"
+
+
+class UserMailNotExistHTTPException(BookingsHTTPExceptions):
+    status_code = 422
+    detail = "Неправильно введены данные почты"
+
+
+class UserWrongEnterPswHTTPException(BookingsHTTPExceptions):
+    status_code = 422
+    detail = "Неверный пароль"
+
+
+class TokenErrorHTTPException(BookingsHTTPExceptions):
+    status_code = 401
+    detail = "Вы не аутентифицированы"

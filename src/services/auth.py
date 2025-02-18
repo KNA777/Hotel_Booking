@@ -1,12 +1,13 @@
 from datetime import datetime, timezone, timedelta
 
-from fastapi import HTTPException
+from fastapi import HTTPException, Response
 
 from src.config import settings
 from passlib.context import CryptContext
 import jwt
 
-from src.exceptions import ObjectAlreadyExistsException, UserMailAlreadyExist
+from src.exceptions import ObjectAlreadyExistsException, UserMailAlreadyExist, UserRegistrationPswException, \
+    UserMailNotExistException, ObjectNotFoundException, UserWrongEnterPswException
 from src.services.base import BaseService
 from src.shemas.users import UserRequestAdd, UserAdd
 
@@ -43,6 +44,8 @@ class AuthService(BaseService):
 
 
     async def register(self, data: UserRequestAdd):
+        if len(data.password) < 6:
+            raise UserRegistrationPswException
         hashed_password = self.hashed_password(data.password)
         user_add_data = UserAdd(email=data.email, hashed_password=hashed_password)
         try:
@@ -50,3 +53,14 @@ class AuthService(BaseService):
             await self.db.commit()
         except ObjectAlreadyExistsException:
             raise UserMailAlreadyExist
+
+    async def login(self, response: Response, data: UserRequestAdd):
+        try:
+            user = await self.db.users.get_user_with_hashed_psw(email=data.email)
+        except ObjectNotFoundException:
+            raise UserMailNotExistException
+        if not AuthService.verify_password(data.password, user.hashed_password):
+            raise UserWrongEnterPswException
+        access_token = AuthService.create_access_token({"user_id": user.id})
+        response.set_cookie("access_token", access_token)
+        return access_token

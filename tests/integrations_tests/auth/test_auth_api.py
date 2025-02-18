@@ -2,7 +2,7 @@ from fastapi import Request
 
 data_user = {
     "email": "nikita@kar.ru",
-    "password": "1234"
+    "password": "12345678"
 }
 stats_code_200 = 200
 
