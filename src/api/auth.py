@@ -1,5 +1,6 @@
 from fastapi import Response
 from fastapi import APIRouter, Body
+
 from src.api.dependencies import UserIdDep, DBDep
 from src.exceptions import MailAlreadyExistHTTPException, UserMailAlreadyExist, \
     UserRegistrationPswException, UserRegistrationPswHTTPException, UserMailNotExistException, \

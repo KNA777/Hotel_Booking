@@ -64,5 +64,4 @@ async def test_count_bookings(
     )
     assert response.status_code == status_code
     res = await auth_ac.get("/bookings/me")
-    print(res.json())
     assert len(res.json()) == count_booking

@@ -3,10 +3,10 @@ class DataMapper:
     schema = None
 
     @classmethod
-    def map_to_domain_entity(cls, data):
+    def map_to_domain_entity(cls, data): # Из Алхимии в pydantic схему
         return cls.schema.model_validate(
             data, from_attributes=True
-        )  # Из Алхимии в pydantic схему
+        )
 
     @classmethod
     def map_to_persistence_entity(cls, data):

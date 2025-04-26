@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список объектов</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Список объектов</h1>
+    <button onclick="fetchFacilities()">Загрузить объекты</button>
+    <table id="facilitiesTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Данные об объектах будут добавлены сюда -->
+        </tbody>
+    </table>
+
+    <script>
+        // Функция для загрузки данных об объектах
+        async function fetchFacilities() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/facilities');
+                if (!response.ok) {
+                    throw new Error('Ошибка при загрузке данных');
+                }
+                const facilities = await response.json();
+                displayFacilities(facilities);
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        }
+
+        // Функция для отображения данных в таблице
+        function displayFacilities(facilities) {
+            const tableBody = document.querySelector('#facilitiesTable tbody');
+            tableBody.innerHTML = ''; // Очищаем таблицу перед добавлением новых данных
+
+            facilities.forEach(facility => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${facility.id}</td>
+                    <td>${facility.title}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
