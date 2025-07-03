@@ -4,6 +4,7 @@ from turtledemo.sorting_animate import start_ssort
 from fastapi import HTTPException
 
 from fastapi import APIRouter, Query, Path, Body
+from fastapi.openapi.models import Example
 from fastapi_cache.decorator import cache
 
 from src.api.dependencies import PaginationDep, DBDep
@@ -12,6 +13,32 @@ from src.services.hotels import HotelService
 from src.shemas.hotels import HotelPatch, HotelAdd
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
+
+examples = {
+    "1": Example(
+        summary="Москва",
+        value={
+            "title": "Redisson",
+            "location": "Москва, Проспект Победы 77",
+        },
+    ),
+    "2": Example(
+        summary="Тверь",
+        value={
+            "title": "Zvezda",
+            "location": "Тверь, Симеоновская 60",
+        },
+    ),
+    "3": Example(
+        summary="Санкт-Петербург",
+        value={
+            "title": "Kovalevskaya",
+            "location": "Санкт-Петербург, Невский проспект 100",
+        },
+    ),
+}
+
+
 
 
 @router.get("", summary="Получение всех отелей")
@@ -45,27 +72,7 @@ async def get_one_hotel(hotel_id: int, db: DBDep):
 async def create_hotel(
         db: DBDep,
         hotel_data: HotelAdd = Body(
-            openapi_examples={
-                "1": {
-                    "summary": "Москва",
-                    "value": {
-                        "title": "Redisson",
-                        "location": "Москва, Проспект Победы 77",
-                    },
-                },
-                "2": {
-                    "summary": "Тверь",
-                    "value": {"title": "Zvezda", "location": "Тверь, Симеоновская 60"},
-                },
-                "3": {
-                    "summary": "Санкт-Петербург",
-                    "value": {
-                        "title": "Kovalevskaya",
-                        "location": "Санкт-Петербург, Невский проспект 100",
-                    },
-                },
-            }
-        ),
+            openapi_examples=examples)
 ):
     hotel = await HotelService(db).add_hotel(hotel_data)
     return {"status": "OK", "hotel": hotel}

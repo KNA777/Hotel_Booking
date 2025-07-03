@@ -4,20 +4,20 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    MODE: Literal["TEST", "LOCAL", "DEV", "PROD"]
+    MODE: Literal["TEST", "LOCAL", "DEV", "PROD"] = None
 
-    DB_NAME: str
-    DB_PORT: int
-    DB_USER: str
-    DB_PASS: str
-    DB_HOST: str
+    DB_USER: str = None
+    DB_PASS: str = None
+    DB_HOST: str = None
+    DB_PORT: int = None
+    DB_NAME: str = None
 
-    JWT_SECRET_KEY: str
-    JWT_ALGORITHM: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    JWT_SECRET_KEY: str = None
+    JWT_ALGORITHM: str = None
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = None
 
-    REDIS_HOST: str
-    REDIS_PORT: int
+    REDIS_HOST: str = None
+    REDIS_PORT: int = None
 
     @property
     def REDIS_URL(self):
